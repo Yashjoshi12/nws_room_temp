@@ -1,0 +1,44 @@
+/* src/App.css */
+body {
+  background-color: #0e1e2b;
+  color: white;
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  padding: 20px;
+  text-align: center;
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.card {
+  background-color: #1f2d3d;
+  border-radius: 12px;
+  padding: 20px;
+  width: 250px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.status-ok {
+  color: #00ff00;
+  font-weight: bold;
+}
+
+.status-fail {
+  color: #ff3c3c;
+  font-weight: bold;
+}
