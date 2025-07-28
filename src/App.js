@@ -10,8 +10,8 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [hasAlert, setHasAlert] = useState(false);
 
-  const dataUrl = "http://localhost:5000/api/plc-data";
-  const groupUrl = "http://localhost:5000/api/area-groups";
+  const dataUrl = "http://172.29.176.55:5000/api/plc-data";
+  const groupUrl = "http://172.29.176.55:5000/api/area-groups";
 
   // Load area-groups and initial data on first load
   useEffect(() => {
