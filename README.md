@@ -68,3 +68,81 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+
+const express = require("express");
+const cors = require("cors");
+const sql = require("mssql");
+
+const app = express();
+const PORT = 5000;
+
+app.use(cors({
+  origin: "http://localhost:3000",
+  credentials: true
+}));
+// SQL Server config
+const dbConfig = {
+  user: "ANDON",
+  password: "Tml@1278",
+  server: "172.25.166.224",          // e.g., 'localhost' or '192.168.1.100'
+  database: "Planthead",
+  options: {
+    encrypt: false,                 // Set to true for Azure or if required
+    trustServerCertificate: false  // Set to true for local dev with self-signed cert
+  }
+};
+
+// Dummy PLC-like environment data
+const dummyData = {
+  AREA1: {
+    AREA1_TEMPERATURE: 24.5,
+    AREA1_HUMIDITY: 60,
+    AREA1_STATUS: 0,
+  },
+  AREA2: {
+    AREA2_TEMPERATURE: 30.2,
+    AREA2_HUMIDITY: 45,
+    AREA2_STATUS: 1,
+  },
+  AREA3: {
+    AREA3_TEMPERATURE: 22.8,
+    AREA3_HUMIDITY: 55,
+  },
+};
+
+// API: /api/plc-data
+app.get("/api/plc-data", (req, res) => {
+  res.json(dummyData);
+});
+
+// API: /api/area-groups (Fetch from MSSQL DB)
+app.get("/api/area-groups", async (req, res) => {
+  try {
+    // Connect to the DB
+    await sql.connect(dbConfig);
+
+    // Run query
+    const result = await sql.query(`
+      SELECT area_key, major_area, display_name FROM area_groups
+    `);
+
+    // Format response
+    const data = {};
+    result.recordset.forEach((row) => {
+      data[row.area_key] = {
+        major_area: row.major_area,
+        display_name: row.display_name,
+      };
+    });
+
+    res.json(data);
+  } catch (err) {
+    console.error("MSSQL Error:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`Mock PLC API server running at http://localhost:${PORT}`);
+});
