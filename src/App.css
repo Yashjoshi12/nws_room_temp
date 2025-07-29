@@ -13,19 +13,21 @@ body {
 }
 
 .grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 15px;
   margin-top: 20px;
+  justify-items: center;
 }
 
+
 .card {
+  width: 13vw; /* Responsive width */
+  min-width: 180px;
   background-color: #1f2d3d;
   border-radius: 12px;
-  padding: 20px;
-  width: 250px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  padding: 1.5vh;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   transition: 0.3s;
 }
 
@@ -120,13 +122,17 @@ body {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 90px;
+  gap: 3vw;
+  flex-wrap: wrap;
   padding: 10px 20px;
 }
-
+.value {
+  font-size: 2vw; /* scaled with screen */
+  font-weight: bold;
+}
 .company-logo {
-  height: 60px;
-  width: 400px;
+  height: auto;
+  width: 20vw;
   background-color: transparent;
 }
 .footer-note {
@@ -146,13 +152,8 @@ body {
 }
 
 .symbol {
-  font-size: 40px; /* adjust icon size here */
-  margin-right: 10px;
-}
-
-.value {
-  font-size: 32px; /* adjust number size here */
-  font-weight: bold;
+  font-size: 2.5vw;
+  margin-right: 8px;
 }
 
 .alert {

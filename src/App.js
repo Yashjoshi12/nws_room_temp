@@ -1,44 +1,43 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import logo from "./logo.jpg"; // adjust path if needed
-
-const dataUrl = "http://172.29.176.55:5000/api/plc-data";
-const groupUrl = "http://172.29.176.55:5000/api/area-groups";
+import logo from "./logo.jpg";
 
 function App() {
   const [envData, setEnvData] = useState({});
   const [areaGroups, setAreaGroups] = useState({});
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    Promise.all([
-      fetch(dataUrl).then((res) => res.json()),
-      fetch(groupUrl).then((res) => res.json()),
-    ])
-      .then(([dataRes, groupRes]) => {
-        setEnvData(dataRes);
-        setAreaGroups(groupRes);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching data:", err);
-        setLoading(false);
-      });
-  }, []);
+    async function fetchData() {
+      try {
+        const [plcRes, groupRes] = await Promise.all([
+          fetch("http://172.29.176.55:5000/api/plc-data"),
+          fetch("http://172.29.176.55:5000/api/area-groups")
+        ]);
 
-  // Poll envData every 5 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetch(dataUrl)
-        .then((res) => res.json())
-        .then((dataRes) => setEnvData(dataRes))
-        .catch((err) => console.error("Polling error:", err));
-    }, 5000);
+        if (!plcRes.ok || !groupRes.ok) {
+          throw new Error("Failed to fetch API data");
+        }
 
-    return () => clearInterval(interval);
+        const plcData = await plcRes.json();
+        const groupData = await groupRes.json();
+
+        setEnvData(plcData);
+        setAreaGroups(groupData);
+      } catch (err) {
+        console.error("Fetch error:", err);
+        setError(err.message || "Error fetching data");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
   }, []);
 
   if (loading) return <h2>Loading...</h2>;
+  if (error) return <h2 style={{ color: "red" }}>⚠️ {error}</h2>;
 
   return (
     <div className="container">
@@ -56,10 +55,7 @@ function App() {
           const isAlert = status !== undefined && status !== 0;
 
           return (
-            <div
-              key={areaKey}
-              className={`card ${isAlert ? "alert" : ""}`}
-            >
+            <div key={areaKey} className={`card ${isAlert ? "alert" : ""}`}>
               <h2>{meta.display_name}</h2>
 
               <div className="value-row">
@@ -80,11 +76,7 @@ function App() {
                 </span>
               </div>
 
-              {isAlert && (
-                <div className="alert-label">
-                  ⚠️ Alert
-                </div>
-              )}
+              {isAlert && <div className="alert-label">⚠️ Alert</div>}
             </div>
           );
         })}
